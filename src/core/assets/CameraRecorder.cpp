@@ -3,7 +3,7 @@
  * GRAPHDECO research group, https://team.inria.fr/graphdeco
  * All rights reserved.
  *
- * This software is free for non-commercial, research and evaluation use 
+ * This software is free for non-commercial, research and evaluation use
  * under the terms of the LICENSE.md file.
  *
  * For inquiries contact sibr@inria.fr and/or George.Drettakis@inria.fr
@@ -14,6 +14,7 @@
 #include "core/assets/CameraRecorder.hpp"
 #include "core/assets/InputCamera.hpp"
 #include <opencv2/imgcodecs.hpp>
+#include <boost/filesystem.hpp>
 
 namespace sibr
 {
@@ -21,7 +22,7 @@ namespace sibr
 	{
 		if (_recording) {
 			_cameras.push_back(cam);
-		} 
+		}
 		else if (_playing && _pos < _cameras.size() ) {
 			const float znear = cam.znear();
 			const float zfar = cam.zfar();
@@ -36,7 +37,7 @@ namespace sibr
 				}
 				// Interpolate between the two closest cameras.
 				const float k = std::min(std::max(_interp, 0.0f), 1.0f);
-				
+
 				sibr::Camera & camStart = _cameras[std::min(int(_pos), int(_cameras.size()) - 1)];
 				sibr::Camera & camNext = _cameras[std::min(int(_pos) + 1, int(_cameras.size())-1)];
 
@@ -49,7 +50,7 @@ namespace sibr
 				_pos++;
 				if (_pos == _cameras.size())
 					_playNoInterp = false;
-				
+
 			}
 
 			// Preserve the znear and zfar.
@@ -70,7 +71,7 @@ namespace sibr
 				stop();
 				SIBR_LOG << "[CameraRecorder] - Playback Finished" << std::endl;
 			}
-		} 
+		}
 		else {
 			//std::cout << _playing << std::endl;
 			cam.setSavePath("");
@@ -169,7 +170,7 @@ namespace sibr
 			return true;
 		} else if (path.extension().string() == ".path") {
 			return load(filename);
-		} 
+		}
 		SIBR_WRG << "Unable to load camera path" << std::endl;
 		return false;
 	}
@@ -193,7 +194,7 @@ namespace sibr
 		std::vector<InputCamera::Ptr> cameras(numImages);
 		//  Parse bundle.out file for camera calibration parameters
 		for (int i = 0; i < numImages; i++) {
-		
+
 			Matrix4f m;
 			bundle_file >> m(0) >> m(1) >> m(2) >> m(3) >> m(4);
 			bundle_file >> m(5) >> m(6) >> m(7) >> m(8) >> m(9);
@@ -250,7 +251,7 @@ namespace sibr
 		}
 
 		const int size = static_cast<int>(_cameras.size() / step);
-		
+
 		out << "# Bundle file v0.3\n";
 		out << size << " " << 0 << "\n";
 
@@ -278,7 +279,7 @@ namespace sibr
 		out.close();
 
 		SIBR_LOG << "[CameraRecorder] - Saved " << _cameras.size() << " cameras to " << filePath << " (using fovy " <<_cameras[0].fovy() << ")." << std::endl;
-		
+
 	}
 
 	void CameraRecorder::saveAsColmap(const std::string& filePath, const int height, const int width)
@@ -306,7 +307,7 @@ namespace sibr
 		}
 
 		const int size = static_cast<int>(_cameras.size());
-		
+
 		sibr::Matrix3f converter;
 		converter << 1, 0, 0,
 			0, -1, 0,
@@ -322,11 +323,11 @@ namespace sibr
 			sibr::Matrix3f Qinv = tmp.transpose();
 			sibr::Quaternionf q = quatFromMatrix(Qinv);
 			sibr::Vector3f t = converter * _cameras[i].rotation().toRotationMatrix().transpose() * (-_cameras[i].position());
-		
+
 
 			out_images << i << " " << -_cameras[i].rotation().x() << " " << -_cameras[i].rotation().w() << " " << -_cameras[i].rotation().z() << " " << _cameras[i].rotation().y() << " " <<
 				_cameras[i].view()(0, 3) << " " << -_cameras[i].view()(1, 3) << " " << -_cameras[i].view()(2, 3) << " " << i << " " << "00000000.png" << std::endl << std::endl;
-			
+
 			float focal = 0.5f * height / tan(_cameras[i].fovy() / 2.f);
 			//float focal = 1.0f / (tan(0.5f * cam.fovy()) * 2.0f / float(height));
 			out_cameras << i << " " << "PINHOLE" << " " << width << " " << height << " " << focal << " " << focal << " " << width / 2.0 << " " << height / 2.0 << std::endl;
@@ -414,11 +415,11 @@ namespace sibr
 			return false;
 		}
 		_ow = w, _oh = h;
-		if (boost::filesystem::extension(pathFileName) == ".out")
+		if (boost::filesystem::path(pathFileName).extension().string() == ".out")
 			loadBundle(pathFileName, w, h);
-		else if (boost::filesystem::extension(pathFileName) == ".lookat")
+		else if (boost::filesystem::path(pathFileName).extension().string() == ".lookat")
 			loadLookat(pathFileName, w, h);
-		else if (boost::filesystem::extension(pathFileName) == ".txt")
+		else if (boost::filesystem::path(pathFileName).extension().string() == ".txt")
 			loadColmap(pathFileName, w, h);
 		else
 			load(pathFileName);
@@ -445,9 +446,9 @@ namespace sibr
 				SIBR_ERR << "Error creating directory " << dstFolder << std::endl;
 		}
 
-        if( prefix != "" ) 
+        if( prefix != "" )
     		dstFolder = outpathd = outpathd + "/" + prefix;
-        else 
+        else
             dstFolder = outpathd ;
 
 		if (!directoryExists(outpathd) && !boost::filesystem::create_directories(dstFolder))

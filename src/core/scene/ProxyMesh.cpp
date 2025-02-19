@@ -3,7 +3,7 @@
  * GRAPHDECO research group, https://team.inria.fr/graphdeco
  * All rights reserved.
  *
- * This software is free for non-commercial, research and evaluation use 
+ * This software is free for non-commercial, research and evaluation use
  * under the terms of the LICENSE.md file.
  *
  * For inquiries contact sibr@inria.fr and/or George.Drettakis@inria.fr
@@ -11,7 +11,7 @@
 
 
 #include "ProxyMesh.hpp"
-
+#include <boost/filesystem.hpp>
 
 namespace sibr {
 
@@ -19,7 +19,7 @@ namespace sibr {
 	{
 		_proxy.reset(new Mesh());
 		// GD HACK
-		if (boost::filesystem::extension(data->meshPath()) == ".bin") {
+		if (boost::filesystem::path(data->meshPath()).extension().string() == ".bin") {
 			if (!_proxy->loadSfM(data->meshPath(), data->basePathName())) {
 				SIBR_WRG << "proxy model not found at " << data->meshPath() << std::endl;
 			}
@@ -58,4 +58,3 @@ namespace sibr {
 
 
 }
-

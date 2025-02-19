@@ -3,7 +3,7 @@
  * GRAPHDECO research group, https://team.inria.fr/graphdeco
  * All rights reserved.
  *
- * This software is free for non-commercial, research and evaluation use 
+ * This software is free for non-commercial, research and evaluation use
  * under the terms of the LICENSE.md file.
  *
  * For inquiries contact sibr@inria.fr and/or George.Drettakis@inria.fr
@@ -17,6 +17,9 @@
 #include "core/raycaster/Raycaster.hpp"
 #include "core/view/UIShortcuts.hpp"
 #include "core/graphics/GUI.hpp"
+
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
 
 # define IBRVIEW_SMOOTHCAM_POWER	0.1f
 # define IBRVIEW_USESMOOTHCAM		true
@@ -132,7 +135,7 @@ namespace sibr {
 			idealCam.znear(clippingPlanes[0]);
 			idealCam.zfar(clippingPlanes[1]);
 		}
-		
+
 		SIBR_LOG << "Interactive camera using (" << idealCam.znear() << "," << idealCam.zfar() << ") near/far planes." << std::endl;
 
 		setup(idealCam, viewport, raycaster);
@@ -152,7 +155,7 @@ namespace sibr {
 
 		sibr::InputCamera idealCam(cam);
 		if (updateResolution) {
-			// Viewport might have not been set, in this case defer the full camera update 
+			// Viewport might have not been set, in this case defer the full camera update
 			// until after the viewport has been updated, ie in onUpdate().
 			if (_viewport.isEmpty()) {
 				_triggerCameraUpdate = true;
@@ -272,7 +275,7 @@ namespace sibr {
 		}
 
 		selectedCam = combinedWeight.begin()->second;
-		
+
 		return selectedCam;
 	}
 
@@ -441,7 +444,7 @@ namespace sibr {
 				std::cin.get();
 
 				_cameraRecorder.reset();
-				if (boost::filesystem::extension(filename) == ".out")
+				if (fs::path(filename).extension().string() == ".out")
 					_cameraRecorder.loadBundle(filename, w, h);
 				else
 					_cameraRecorder.load(filename);
@@ -685,21 +688,21 @@ namespace sibr {
 						if (!selectedFile.empty()) {
 							SIBR_LOG << "Loading" << std::endl;
 							_cameraRecorder.reset();
-							if (boost::filesystem::extension(selectedFile) == ".out")
+							if (fs::path(selectedFile).extension().string() == ".out")
 								_cameraRecorder.loadBundle(selectedFile, _currentCamera.w(), _currentCamera.h());
-							else if (boost::filesystem::extension(selectedFile) == ".lookat")
+							else if (fs::path(selectedFile).extension().string() == ".lookat")
 								_cameraRecorder.loadLookat(selectedFile, _currentCamera.w(), _currentCamera.h());
-							else if (boost::filesystem::extension(selectedFile) == ".txt")
+							else if (fs::path(selectedFile).extension().string() == ".txt")
 								_cameraRecorder.loadColmap(selectedFile, _currentCamera.w(), _currentCamera.h());
 							else
 								_cameraRecorder.load(selectedFile);
-// dont play back until explicitly requested 
+// dont play back until explicitly requested
 //							_cameraRecorder.playback();
 						}
 
 					}
 				}
-				
+
 				ImGui::SameLine();
 				if (ImGui::Button("Save path")) {
 					_cameraRecorder.stop();
@@ -723,7 +726,7 @@ namespace sibr {
 				if (_saveFrame) {
 					_cameraRecorder.savingVideo(_saveFrame);
 				}
-				
+
 				ImGui::SameLine();
 				const bool saveFrameOld = _saveFrameVideo;
 				ImGui::Checkbox("Save frames (from playing)", (&_saveFrameVideo));
@@ -744,7 +747,7 @@ namespace sibr {
 					_cameraRecorder.stopSaving();
 					_cameraRecorder.savingVideo(_saveFrameVideo);
 				}
-				
+
 				//ImGui::SameLine();
 				//ImGui::Checkbox("Fribr export", &_fribrExport);
 				ImGui::Separator();
@@ -754,9 +757,8 @@ namespace sibr {
 		}
 		// add the FPS camera controls in the same ImGui window.
 		_fpsCamera.onGUI(suffix);
-		
+
 
 	}
 
 }
-

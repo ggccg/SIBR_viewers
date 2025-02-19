@@ -3,7 +3,7 @@
  * GRAPHDECO research group, https://team.inria.fr/graphdeco
  * All rights reserved.
  *
- * This software is free for non-commercial, research and evaluation use 
+ * This software is free for non-commercial, research and evaluation use
  * under the terms of the LICENSE.md file.
  *
  * For inquiries contact sibr@inria.fr and/or George.Drettakis@inria.fr
@@ -35,9 +35,9 @@ void sibr::RemotePointView::send_receive()
 		SIBR_LOG << "Trying to connect..." << std::endl;
 		try
 		{
-			boost::asio::io_service ioservice;
+			boost::asio::io_context ioservice;
 			boost::asio::ip::tcp::socket sock(ioservice);
-			boost::asio::ip::address addr = boost::asio::ip::address::from_string(_ip);
+			boost::asio::ip::address addr = boost::asio::ip::make_address(_ip);
 			boost::asio::ip::tcp::endpoint contact(addr, _port);
 
 			boost::system::error_code ec;
@@ -187,7 +187,7 @@ void sibr::RemotePointView::onRenderIBR(sibr::IRenderTarget & dst, const sibr::C
 void sibr::RemotePointView::onGUI()
 {
 	const std::string guiName = "Remote Viewer Settings (" + name() + ")";
-	if (ImGui::Begin(guiName.c_str())) 
+	if (ImGui::Begin(guiName.c_str()))
 	{
 		ImGui::Checkbox("Show Input Points", &_showSfM);
 		ImGui::Checkbox("Show Input Points during Motion", &_renderSfMInMotion);
