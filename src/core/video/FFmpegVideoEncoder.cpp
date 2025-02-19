@@ -3,7 +3,7 @@
  * GRAPHDECO research group, https://team.inria.fr/graphdeco
  * All rights reserved.
  *
- * This software is free for non-commercial, research and evaluation use 
+ * This software is free for non-commercial, research and evaluation use
  * under the terms of the LICENSE.md file.
  *
  * For inquiries contact sibr@inria.fr and/or George.Drettakis@inria.fr
@@ -45,7 +45,7 @@ namespace sibr {
 #pragma warning(suppress : 4996)
 			ffmpegInitDone = true;
 		}
-		
+
 		sibr::Vector2i sizeFix = size;
 		bool hadToFix = false;
 		if(sizeFix[0]%2 != 0) {
@@ -60,7 +60,7 @@ namespace sibr {
 			SIBR_WRG << "Non-even video dimensions, resized to " << sizeFix[0] << "x" << sizeFix[1] << "." << std::endl;
 			_forceResize = true;
 		}
-		
+
 		init(sizeFix);
 #endif
 	}
@@ -116,7 +116,7 @@ namespace sibr {
 		} else {
 			SIBR_LOG << "[FFMPEG] Found codec with ID " << pFormatCtx->oformat->video_codec << " (not H264)." << std::endl;
 		}
-		
+
 		if (avio_open(&pFormatCtx->pb, out_file, AVIO_FLAG_READ_WRITE) < 0) {
 			SIBR_WRG << "[FFMPEG] Could not open file " << filepath << std::endl;
 			return;
